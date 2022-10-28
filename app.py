@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+import sys
 
 #============ CONFIGURATIONS ==========================#
 app = Flask(__name__)
@@ -25,12 +26,20 @@ def index():
 
 @app.route('/todos/create', methods=['POST'])
 def create():
-    todo = Todo(description=request.form.get('description'))
+    error = False
+    body = {} # prevents detached session error
     try:
+        todo = Todo(description=request.get_json()['description']) # get description from request
         db.session.add(todo)
         db.session.commit()
+        body['description'] = todo.description # add description to body after successful commit
     except:
         db.session.rollback()
+        error = True
+        print(sys.exc_info()) # print the exception error message
     finally:
-        db.session.close()
-        return redirect(url_for('index'))
+        db.session.close()  # close session
+        if error:
+            abort(400) # abort the request incase of an error
+        else:
+            return jsonify(body) # return the json response back to the client
