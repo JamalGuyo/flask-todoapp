@@ -20,6 +20,15 @@
         padding: 0;
         margin: 0;
     }
+
+    li {
+        padding: .2em 1em;
+        background: rgba(145, 163, 181, 0.091);
+    }
+
+    li label {
+        margin-right: 2em
+    }
 </style>
 
 <body>
@@ -27,10 +36,11 @@
         <h1>Todo App</h1>
 
         <div class="row mb-2">
-            <form id="form">
+            <form id="form" class="form-inline">
                 <label for="description">Description</label>
                 <input type="text" class="form-control" id="description" name="description">
-                <button type="submit" class="btn btn-primary form-control">add todo</button>
+
+                <button type="submit" class="btn btn-primary">add todo</button>
             </form>
         </div>
 
@@ -40,9 +50,12 @@
             <ul id="todo">
                 {% for d in data %}
                 <li>
-                    <input class="check-completed" type="checkbox" data-id="{{d.id}}" {%if d.completed %} checked {%
-                        endif %}{{ d.description }} />
-                    {{d.description}}
+                    <label>
+                        <input class="check-completed" type="checkbox" data-id="{{d.id}}" {%if d.completed %} checked {%
+                            endif %}{{ d.description }} />
+                        {{d.description}}
+                    </label>
+                    <button class="btn btn-sm text-danger">X</button>
                 </li>
                 {% endfor %}
             </ul>
