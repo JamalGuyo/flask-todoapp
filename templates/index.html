@@ -22,12 +22,11 @@
     }
 
     li {
+        width: 250px;
+        display: flex;
+        justify-content: space-between;
         padding: .2em 1em;
-        background: rgba(145, 163, 181, 0.091);
-    }
-
-    li label {
-        margin-right: 2em
+        background: rgba(145, 163, 181, 0.091between);
     }
 </style>
 
@@ -55,7 +54,7 @@
                             endif %}{{ d.description }} />
                         {{d.description}}
                     </label>
-                    <button class="btn btn-sm text-danger">X</button>
+                    <button data-id="{{d.id}}" class=" delete-todo btn btn-sm text-danger">&cross;</button>
                 </li>
                 {% endfor %}
             </ul>
@@ -64,7 +63,7 @@
 </body>
 
 <script>
-    /*========on form submission =====================*/
+    /*======== create todo =====================*/
     document.getElementById('form').onsubmit = (e => {
         e.preventDefault();
         fetch('/todos/create', {
@@ -77,7 +76,6 @@
             }
         }).then(response => response.json())
             .then(data => {
-                Error
                 const liElement = document.createElement('li');
                 liElement.innerHTML = data.description;
                 document.getElementById('todo').appendChild(liElement);
@@ -88,9 +86,9 @@
             })
     })
     /*=========check completed ======================*/
-    checkboxes = document.querySelectorAll('.check-completed');
+    const checkboxes = document.querySelectorAll('.check-completed');
     for (let i = 0; i < checkboxes.length; i++) {
-        checkbox = checkboxes[i];
+        const checkbox = checkboxes[i];
         checkbox.onchange = e => {
             const newCompleted = e.target.checked;
             const todoId = e.target.dataset['id'];
@@ -113,6 +111,17 @@
         }
     }
 
+    /*========= delete todo =====================*/
+    const btns = document.querySelectorAll('.delete-todo');
+    for (let i = 0; i < btns.length; i++) {
+        const btn = btns[i];
+        btn.onclick = e => {
+            const todoId = e.target.dataset['id'];
+            fetch(`/todos/${todoId}`, {
+                method: 'DELETE',
+            })
+        }
+    }
 </script>
 
 </html>
