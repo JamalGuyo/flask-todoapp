@@ -20,7 +20,7 @@ class Todo(db.Model):
     list_id = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
 
     def __repr__(self):
-        return f'<Todo id={self.id} description={self.description}>'
+        return f'<Todo id={self.id} description={self.description} list_id={self.list_id}>'
 
 class TodoList(db.Model):
     __tablename__ = 'todolists'
@@ -36,7 +36,11 @@ class TodoList(db.Model):
 #=========== CONTROLLERS =========================================#
 @app.route('/')
 def index():
-    return render_template('index.html', data=Todo.query.order_by('id').all())
+    return redirect(url_for('get_todo_list', list_id=1))
+
+@app.route('/lists/<list_id>')
+def get_todo_list(list_id):
+    return render_template('index.html', data=Todo.query.filter_by(list_id = list_id).order_by('id').all())
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
