@@ -40,7 +40,34 @@ def index():
 
 @app.route('/lists/<list_id>')
 def get_todo_list(list_id):
-    return render_template('index.html', data=Todo.query.filter_by(list_id = list_id).order_by('id').all())
+    return render_template('index.html',\
+     lists = TodoList.query.order_by('id').all(),\
+     active_list = TodoList.query.get(list_id),\
+     todos=Todo.query.filter_by(list_id = list_id).order_by('id').all())
+
+@app.route('/lists/create', methods=['POST'])
+def create_list():
+    error = False
+    body = {}
+
+    try:
+        list = TodoList(name = request.get_json()['name'])
+        db.session.add(list)
+        db.session.commit()
+        listed = TodoList.query.filter_by(name=list.name ).first()
+        body['name'] = listed.name
+        body['id'] = listed.id
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        if error:
+            abort(400)
+        else:
+            return jsonify(body)    
+
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
